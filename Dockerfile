@@ -21,9 +21,12 @@ RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/re
     apk add --update --allow-untrusted \
         nginx \
         supervisor \
+        curl \
         php7@testing \
         php7-dev@testing \
         php7-opcache@testing \
+        php7-openssl@testing \
+        php7-phar@testing \
         php7-mcrypt@testing \
         php7-mbstring@testing \
         php7-json@testing \
@@ -51,6 +54,9 @@ RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/re
     echo "xdebug.var_display_max_children = -1" >> /etc/php7/conf.d/xdebug.ini && \
     echo "xdebug.var_display_max_data = -1 " >> /etc/php7/conf.d/xdebug.ini && \
     echo "xdebug.remote_host="`/sbin/ip route|awk '/default/ { print $6 }'` >> /etc/php7/conf.d/xdebug.ini && \
+    ln -sf /usr/bin/php7 /usr/bin/php && \
+    curl --insecure -sS https://getcomposer.org/installer | php && \
+    mv composer.phar /usr/bin/composer && \
     mkdir /etc/nginx/sites-enabled && \
     mkdir /www && \
     apk del tzdata && \
