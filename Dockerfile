@@ -22,6 +22,9 @@ RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/re
         nginx \
         supervisor \
         curl \
+        git \
+        openssh-client \
+        bash \
         php7@testing \
         php7-dev@testing \
         php7-opcache@testing \
@@ -58,7 +61,14 @@ RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/re
     curl --insecure -sS https://getcomposer.org/installer | php && \
     mv composer.phar /usr/bin/composer && \
     mkdir /etc/nginx/sites-enabled && \
+    sed -ri 's;^(root:x:0:0:root:/root:)/bin/ash;\1/bin/bash;' /etc/passwd && \
+    echo "alias ll='ls -lha --color=auto'" >> /root/.bashrc && \
+    echo "alias l='ls -lh --color=auto'" >> /root/.bashrc && \
+    adduser -u 1000 docker -D -s /bin/bash && \
+    cp /root/.bashrc /home/docker/.bashrc && \
+    chown -R docker:docker /home/docker && \
     mkdir /www && \
+    chown -R docker:docker /www && \
     apk del tzdata && \
     rm -fr /tmp/*.apk && \
     rm -rf /var/cache/apk/*
