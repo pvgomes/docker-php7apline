@@ -1,5 +1,5 @@
 # Use Alpine Linux
-FROM alpine:latest
+FROM alpine:3.3
 
 # Timezone
 ENV TIMEZONE America/Sao_Paulo
@@ -8,15 +8,13 @@ ENV MAX_UPLOAD 50M
 ENV PHP_MAX_FILE_UPLOAD 200
 ENV PHP_MAX_POST 100M
 
-COPY ./pkgs/php7redis-2.2.8-r0.apk /tmp/php7redis-2.2.8-r0.apk
-
 RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
     apk update && \
     apk upgrade && \
     apk add --update tzdata && \
     cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
     echo "${TIMEZONE}" > /etc/timezone && \
-    apk add --update --allow-untrusted \
+    apk add --update \
         nginx \
         supervisor \
         curl \
@@ -37,8 +35,8 @@ RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/re
         php7-dom@testing \
         php7-fpm@testing  \
         php7-mongodb@testing \
-        php7-xdebug@testing \
-        /tmp/php7redis-2.2.8-r0.apk && \
+        php7-redis@testing \
+        php7-xdebug@testing && \
     sed -i "s|;date.timezone =.*|date.timezone = ${TIMEZONE}|" /etc/php7/php.ini && \
     sed -i "s|memory_limit =.*|memory_limit = ${PHP_MEMORY_LIMIT}|" /etc/php7/php.ini && \
     sed -i "s|upload_max_filesize =.*|upload_max_filesize = ${MAX_UPLOAD}|" /etc/php7/php.ini && \
