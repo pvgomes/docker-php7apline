@@ -36,6 +36,8 @@ RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/re
         php7-fpm@testing  \
         php7-mongodb@testing \
         php7-redis@testing \
+        php7-bcmath@testing \
+        php7-amqp@testing \
         php7-xdebug@testing && \
     sed -i "s|;date.timezone =.*|date.timezone = ${TIMEZONE}|" /etc/php7/php.ini && \
     sed -i "s|memory_limit =.*|memory_limit = ${PHP_MEMORY_LIMIT}|" /etc/php7/php.ini && \
