@@ -8,6 +8,9 @@ ENV MAX_UPLOAD 50M
 ENV PHP_MAX_FILE_UPLOAD 200
 ENV PHP_MAX_POST 100M
 
+ADD ./conf/nginx.runit /etc/service/nginx/run
+ADD ./conf/php7.runit /etc/service/php7/run
+
 RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
     apk update && \
     apk upgrade && \
@@ -15,12 +18,11 @@ RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/re
     cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
     echo "${TIMEZONE}" > /etc/timezone && \
     apk add --update \
+        runit@testing \
         nginx \
-        supervisor \
         curl \
         git \
         openssh-client \
-        bash \
         php7@testing \
         php7-dev@testing \
         php7-opcache@testing \
@@ -51,31 +53,26 @@ RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/re
     echo "xdebug.remote_port=9001" >> /etc/php7/conf.d/xdebug.ini && \
     echo "xdebug.remote_autostart=1" >> /etc/php7/conf.d/xdebug.ini && \
     echo "xdebug.remote_connect_back=1" >> /etc/php7/conf.d/xdebug.ini && \
-    echo "xdebug.var_display_max_depth = -1 " >> /etc/php7/conf.d/xdebug.ini && \
-    echo "xdebug.var_display_max_children = -1" >> /etc/php7/conf.d/xdebug.ini && \
-    echo "xdebug.var_display_max_data = -1 " >> /etc/php7/conf.d/xdebug.ini && \
     echo "xdebug.remote_host="`/sbin/ip route|awk '/default/ { print $6 }'` >> /etc/php7/conf.d/xdebug.ini && \
     ln -sf /usr/bin/php7 /usr/bin/php && \
     curl --insecure -sS https://getcomposer.org/installer | php && \
     mv composer.phar /usr/bin/composer && \
     mkdir /etc/nginx/sites-enabled && \
-    sed -ri 's;^(root:x:0:0:root:/root:)/bin/ash;\1/bin/bash;' /etc/passwd && \
-    echo "alias ll='ls -lha --color=auto'" >> /root/.bashrc && \
-    echo "alias l='ls -lh --color=auto'" >> /root/.bashrc && \
-    adduser -u 1000 docker -D -s /bin/bash && \
-    cp /root/.bashrc /home/docker/.bashrc && \
+    adduser -u 1000 docker -D -s /bin/ash && \
     chown -R docker:docker /home/docker && \
+    mkdir -p /etc/service && \
+    chmod a+x /etc/service/nginx/run && \
+    chmod a+x /etc/service/php7/run && \
     mkdir /www && \
     chown -R docker:docker /www && \
     apk del tzdata && \
     rm -fr /tmp/*.apk && \
     rm -rf /var/cache/apk/*
 
+ADD ./conf/nginx.conf /etc/nginx/nginx.conf
+ADD ./conf/default.conf /etc/nginx/sites-enabled/default
 ADD ./conf/php-fpm.conf /etc/php7/php-fpm.conf
 ADD ./conf/www.conf /etc/php7/php-fpm.d/www.conf
-ADD ./conf/nginx.conf /etc/nginx/nginx.conf
-ADD ./conf/supervisord.conf /etc/supervisord.conf
-ADD ./conf/default.conf /etc/nginx/sites-enabled/default
 
 # Set Workdir
 WORKDIR /www
@@ -83,4 +80,4 @@ WORKDIR /www
 # Expose ports
 EXPOSE 80 443
 
-CMD ["/usr/bin/supervisord"]
+CMD ["sh", "-c", "exec /sbin/runsvdir -P /etc/service/"]
