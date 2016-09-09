@@ -1,5 +1,5 @@
 # Use Alpine Linux
-FROM alpine:3.3
+FROM alpine:3.4
 
 # Timezone
 ENV TIMEZONE America/Sao_Paulo
@@ -11,36 +11,37 @@ ENV PHP_MAX_POST 100M
 ADD ./conf/nginx.runit /etc/service/nginx/run
 ADD ./conf/php7.runit /etc/service/php7/run
 
-RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
+RUN echo "@community http://nl.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
+    echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
     apk update && \
     apk upgrade && \
     apk add --update tzdata && \
     cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
     echo "${TIMEZONE}" > /etc/timezone && \
     apk add --update \
-        runit@testing \
+        runit@community=2.1.2-r3 \
         nginx \
         curl \
         git \
         openssh-client \
-        php7@testing \
-        php7-dev@testing \
-        php7-opcache@testing \
-        php7-openssl@testing \
-        php7-phar@testing \
-        php7-mcrypt@testing \
-        php7-mbstring@testing \
-        php7-json@testing \
-        php7-common@testing \
-        php7-session@testing \
-        php7-ctype@testing \
-        php7-dom@testing \
-        php7-fpm@testing  \
-        php7-mongodb@testing \
-        php7-redis@testing \
-        php7-bcmath@testing \
-        php7-amqp@testing \
-        php7-xdebug@testing && \
+        php7@community=7.0.10-r2 \
+        php7-dev@community=7.0.10-r2 \
+        php7-opcache@community=7.0.10-r2 \
+        php7-openssl@community=7.0.10-r2 \
+        php7-phar@community=7.0.10-r2 \
+        php7-mcrypt@community=7.0.10-r2 \
+        php7-mbstring@community=7.0.10-r2 \
+        php7-json@community=7.0.10-r2 \
+        php7-common@community=7.0.10-r2 \
+        php7-session@community=7.0.10-r2 \
+        php7-ctype@community=7.0.10-r2 \
+        php7-dom@community=7.0.10-r2 \
+        php7-fpm@community=7.0.10-r2 \
+        php7-bcmath@community=7.0.10-r2 \
+        php7-mongodb@testing=1.1.4-r0 \
+        php7-redis@testing=3.0.0-r1 \
+        php7-amqp@testing=1.7.1-r0 \
+        php7-xdebug@testing=2.4.0-r0 && \
     sed -i "s|;date.timezone =.*|date.timezone = ${TIMEZONE}|" /etc/php7/php.ini && \
     sed -i "s|memory_limit =.*|memory_limit = ${PHP_MEMORY_LIMIT}|" /etc/php7/php.ini && \
     sed -i "s|upload_max_filesize =.*|upload_max_filesize = ${MAX_UPLOAD}|" /etc/php7/php.ini && \
