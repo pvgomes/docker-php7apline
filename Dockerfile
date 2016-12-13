@@ -1,5 +1,5 @@
 # Use Alpine Linux
-FROM alpine:3.4
+FROM alpine:edge
 
 # Timezone
 ENV TIMEZONE America/Sao_Paulo
@@ -24,24 +24,24 @@ RUN echo "@community http://nl.alpinelinux.org/alpine/edge/community" >> /etc/ap
         curl \
         git \
         openssh-client \
-        php7@community=7.0.10-r2 \
-        php7-dev@community=7.0.10-r2 \
-        php7-opcache@community=7.0.10-r2 \
-        php7-openssl@community=7.0.10-r2 \
-        php7-phar@community=7.0.10-r2 \
-        php7-mcrypt@community=7.0.10-r2 \
-        php7-mbstring@community=7.0.10-r2 \
-        php7-json@community=7.0.10-r2 \
-        php7-common@community=7.0.10-r2 \
-        php7-session@community=7.0.10-r2 \
-        php7-ctype@community=7.0.10-r2 \
-        php7-dom@community=7.0.10-r2 \
-        php7-fpm@community=7.0.10-r2 \
-        php7-bcmath@community=7.0.10-r2 \
-        php7-mongodb@testing=1.1.4-r0 \
+        php7@community=7.0.14-r2 \
+        php7-dev@community=7.0.14-r2 \
+        php7-opcache@community=7.0.14-r2 \
+        php7-openssl@community=7.0.14-r2 \
+        php7-phar@community=7.0.14-r2 \
+        php7-mcrypt@community=7.0.14-r2 \
+        php7-mbstring@community=7.0.14-r2 \
+        php7-json@community=7.0.14-r2 \
+        php7-common@community=7.0.14-r2 \
+        php7-session@community=7.0.14-r2 \
+        php7-ctype@community=7.0.14-r2 \
+        php7-dom@community=7.0.14-r2 \
+        php7-fpm@community=7.0.14-r3 \
+        php7-bcmath@community=7.0.14-r2 \
+        php7-mongodb@testing=1.1.4-r1 \
         php7-redis@testing=3.0.0-r1 \
         php7-amqp@testing=1.7.1-r0 \
-        php7-xdebug@testing=2.4.0-r0 && \
+        php7-xdebug@community=2.5.0-r1 && \
     sed -i "s|;date.timezone =.*|date.timezone = ${TIMEZONE}|" /etc/php7/php.ini && \
     sed -i "s|memory_limit =.*|memory_limit = ${PHP_MEMORY_LIMIT}|" /etc/php7/php.ini && \
     sed -i "s|upload_max_filesize =.*|upload_max_filesize = ${MAX_UPLOAD}|" /etc/php7/php.ini && \
